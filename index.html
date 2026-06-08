@@ -15,7 +15,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">🎽</div>
                 <div>
-                    <h1 class="text-xl font-semibold text-slate-800 tracking-wide">ระบบเช็คชื่อคณะสี</h1>
+                    <h1 class="text-xl font-semibold text-slate-800 tracking-wide">ระบบเช็คชื่อคณะสีฟ้า</h1>
                     <p class="text-xs text-blue-400"><span id="sync-status" class="inline-block w-2 h-2 rounded-full bg-amber-400"></span> <span id="sync-text">กำลังเชื่อมต่อ...</span></p>
                 </div>
             </div>
@@ -53,10 +53,11 @@
         <div id="section-dashboard" class="hidden"><div id="dashboard-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div></div>
     </main>
 
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbw7nAaoTsyPsOcoTMGqOz09INrgM9cK7J6qM3P0x1UuHY04CdSQGaQSCatZoCuxkXI/exec";
-        const ADMIN_EMAILS = ["sirsribua04@gmail.com","106422922@stv.ac.th","96422885@stv.ac.th","nantapong232551@gmail.com","parittaks@gmail.com","pao603@gmail.com"];
-             const studentData = {
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbw7nAaoTsyPsOcoTMGqOz09INrgM9cK7J6qM3P0x1UuHY04CdSQGaQSCatZoCuxkXI/exec";
+    const ADMIN_EMAILS = ["sirsribua04@gmail.com","106422922@stv.ac.th","96422885@stv.ac.th","nantapong232551@gmail.com","parittaks@gmail.com","pao603@gmail.com"];
+    
+    const studentData = {
             m1: {
                 "9": [
                     { id: "25910", no: 1, name: "เด็กชายกวีพัฒน์  นกนวล" },
@@ -393,101 +394,118 @@
                     { id: "22898", no: 37, name: "นางสาวอรวรรยา  ไชยสินธุ์" },
                 ]
             }
+    };
+
+    let isAdmin = false;
+    let attendanceRecord = { morning: {}, evening: {} };
+    let currentTimePeriod = 'morning';
+    let currentGrade = 'm1';
+    let currentRoom = '9';
+    let todayDate = new Date().toISOString().slice(0, 10);
+
+    // ตัวแปร elements ที่เคยทำให้คุณค้าง
+    let elements = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+        elements = {
+            syncStatus: document.getElementById('sync-status'),
+            syncText: document.getElementById('sync-text'),
+            gradeSelect: document.getElementById('grade-select'),
+            roomContainer: document.getElementById('room-container'),
+            studentListTbody: document.getElementById('student-list-tbody'),
+            currentViewTitle: document.getElementById('current-view-title'),
+            dashboardGrid: document.getElementById('dashboard-grid'),
+            displayDate: document.getElementById('display-date')
         };
+        init();
+    });
 
-        let isAdmin = false;
-        let attendanceRecord = { morning: {}, evening: {} };
-        let currentTimePeriod = 'morning';
-        let currentGrade = 'm1';
-        let currentRoom = '9';
-        let todayDate = new Date().toISOString().slice(0, 10);
+    async function init() {
+        const savedEmail = localStorage.getItem('stvAdminEmail');
+        if (savedEmail && ADMIN_EMAILS.includes(savedEmail.toLowerCase())) {
+            isAdmin = true;
+            document.getElementById('admin-email-input').value = savedEmail;
+            document.getElementById('admin-email-input').disabled = true;
+        }
+        
+        elements.displayDate.innerText = "วันที่: " + new Date().toLocaleDateString('th-TH');
 
-        // รวมทุกอย่างไว้ในนี้เพื่อแก้ปัญหา elements is not defined
-        document.addEventListener('DOMContentLoaded', () => {
-            window.elements = {
-                gradeSelect: document.getElementById('grade-select'),
-                roomContainer: document.getElementById('room-container'),
-                studentListTbody: document.getElementById('student-list-tbody'),
-                currentViewTitle: document.getElementById('current-view-title'),
-                syncStatus: document.getElementById('sync-status'),
-                syncText: document.getElementById('sync-text')
-            };
-            
-            // ผูก Event
-            elements.gradeSelect.onchange = (e) => { currentGrade = e.target.value; updateRoomButtons(); renderStudents(); };
-            
-            init();
+        try {
+            const res = await fetch(API_URL + "?date=" + todayDate + "&_ts=" + Date.now());
+            attendanceRecord = await res.json();
+            elements.syncText.innerText = "ออนไลน์";
+            elements.syncStatus.className = "inline-block w-2 h-2 rounded-full bg-emerald-500";
+        } catch(e) { elements.syncText.innerText = "ออฟไลน์"; }
+        
+        updateRoomButtons(); 
+        renderStudents();
+        renderDashboard();
+    }
+
+    async function saveData() {
+        const formData = new URLSearchParams();
+        formData.append('payload', JSON.stringify({ date: todayDate, records: attendanceRecord }));
+        try {
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: formData });
+        } catch(e) { console.error(e); }
+    }
+
+    function setStatus(id, status) {
+        if (!isAdmin) return alert("ต้องเข้าสู่ระบบสตาฟก่อน");
+        attendanceRecord[currentTimePeriod][id] = status;
+        saveData(); renderStudents(); renderDashboard();
+    }
+
+    function updateRoomButtons() {
+        elements.roomContainer.innerHTML = '';
+        Object.keys(studentData[currentGrade]).forEach(room => {
+            const btn = document.createElement('button');
+            btn.className = `px-3 py-1 rounded-lg ${currentRoom == room ? 'bg-blue-500 text-white' : 'bg-slate-200'}`;
+            btn.innerText = "ห้อง " + room;
+            btn.onclick = () => { currentRoom = room; renderStudents(); updateRoomButtons(); };
+            elements.roomContainer.appendChild(btn);
         });
+    }
 
-        async function init() {
-            const savedEmail = localStorage.getItem('stvAdminEmail');
-            if (savedEmail && ADMIN_EMAILS.includes(savedEmail.toLowerCase())) {
-                isAdmin = true;
-                document.getElementById('admin-email-input').value = savedEmail;
-                document.getElementById('admin-email-input').disabled = true;
-            }
-            
-            try {
-                const res = await fetch(API_URL + "?date=" + todayDate + "&_ts=" + Date.now());
-                attendanceRecord = await res.json();
-                elements.syncText.innerText = "ออนไลน์";
-                elements.syncStatus.className = "inline-block w-2 h-2 rounded-full bg-emerald-500";
-            } catch(e) { elements.syncText.innerText = "ออฟไลน์"; }
-            updateRoomButtons(); renderStudents();
-        }
+    function renderStudents() {
+        elements.studentListTbody.innerHTML = '';
+        elements.currentViewTitle.innerText = "ห้อง " + currentGrade.toUpperCase() + "/" + currentRoom;
+        studentData[currentGrade][currentRoom].forEach(s => {
+            const status = attendanceRecord[currentTimePeriod][s.id] || '';
+            elements.studentListTbody.innerHTML += `<tr><td class="p-4">${s.no}</td><td class="p-4">${s.name}</td>
+            <td class="p-4">
+                <button onclick="setStatus('${s.id}','present')" class="${status=='present'?'bg-green-500 text-white':''} px-2 rounded">มา</button>
+                <button onclick="setStatus('${s.id}','leave')" class="${status=='leave'?'bg-orange-500 text-white':''} px-2 rounded">ลา</button>
+                <button onclick="setStatus('${s.id}','absent')" class="${status=='absent'?'bg-red-500 text-white':''} px-2 rounded">ขาด</button>
+            </td></tr>`;
+        });
+    }
 
-        async function saveData() {
-            const formData = new URLSearchParams();
-            formData.append('payload', JSON.stringify({ date: todayDate, records: attendanceRecord }));
-            try {
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: formData });
-            } catch(e) { console.error(e); }
-        }
-
-        function setStatus(id, status) {
-            if (!isAdmin) return alert("ต้องเข้าสู่ระบบสตาฟก่อน");
-            attendanceRecord[currentTimePeriod][id] = status;
-            saveData(); renderStudents();
-        }
-
-        function updateRoomButtons() {
-            elements.roomContainer.innerHTML = '';
-            Object.keys(studentData[currentGrade]).forEach(room => {
-                const btn = document.createElement('button');
-                btn.className = `px-3 py-1 rounded-lg ${currentRoom == room ? 'bg-blue-500 text-white' : 'bg-slate-200'}`;
-                btn.innerText = "ห้อง " + room;
-                btn.onclick = () => { currentRoom = room; renderStudents(); updateRoomButtons(); };
-                elements.roomContainer.appendChild(btn);
+    function renderDashboard() {
+        elements.dashboardGrid.innerHTML = '';
+        Object.keys(studentData).forEach(grade => {
+            Object.keys(studentData[grade]).forEach(room => {
+                const students = studentData[grade][room];
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 shadow rounded-lg";
+                card.innerHTML = `<h4 class="font-bold">${grade}/${room}</h4>`;
+                elements.dashboardGrid.appendChild(card);
             });
-        }
+        });
+    }
 
-        function renderStudents() {
-            elements.studentListTbody.innerHTML = '';
-            elements.currentViewTitle.innerText = "ห้อง " + currentGrade.toUpperCase() + "/" + currentRoom;
-            studentData[currentGrade][currentRoom].forEach(s => {
-                const status = attendanceRecord[currentTimePeriod][s.id] || '';
-                elements.studentListTbody.innerHTML += `<tr><td class="p-4">${s.no}</td><td class="p-4">${s.name}</td>
-                <td class="p-4">
-                    <button onclick="setStatus('${s.id}','present')" class="${status=='present'?'bg-green-500 text-white':''} px-2 rounded">มา</button>
-                    <button onclick="setStatus('${s.id}','leave')" class="${status=='leave'?'bg-orange-500 text-white':''} px-2 rounded">ลา</button>
-                    <button onclick="setStatus('${s.id}','absent')" class="${status=='absent'?'bg-red-500 text-white':''} px-2 rounded">ขาด</button>
-                </td></tr>`;
-            });
-        }
+    function toggleAdminAuth() {
+        const email = document.getElementById('admin-email-input').value.trim().toLowerCase();
+        if (isAdmin) { localStorage.removeItem('stvAdminEmail'); location.reload(); }
+        else if (ADMIN_EMAILS.includes(email)) { localStorage.setItem('stvAdminEmail', email); location.reload(); }
+        else { alert("อีเมลไม่ถูกต้อง"); }
+    }
 
-        function toggleAdminAuth() {
-            const email = document.getElementById('admin-email-input').value.trim().toLowerCase();
-            if (isAdmin) { localStorage.removeItem('stvAdminEmail'); location.reload(); }
-            else if (ADMIN_EMAILS.includes(email)) { localStorage.setItem('stvAdminEmail', email); location.reload(); }
-            else { alert("อีเมลไม่ถูกต้อง"); }
-        }
-
-        function switchTab(tab) { 
-            document.getElementById('section-attendance').classList.toggle('hidden', tab !== 'attendance');
-            document.getElementById('section-dashboard').classList.toggle('hidden', tab !== 'dashboard');
-        }
-        function switchTimePeriod(p) { currentTimePeriod = p; renderStudents(); }
-        function exportToCSV() { alert("ส่งออกข้อมูล..."); }
-    </script>
-</body>
-</html>
+    function switchTab(tab) {
+        document.getElementById('section-attendance').classList.toggle('hidden', tab !== 'attendance');
+        document.getElementById('section-dashboard').classList.toggle('hidden', tab !== 'dashboard');
+    }
+    
+    function switchTimePeriod(p) { currentTimePeriod = p; renderStudents(); }
+    function exportToCSV() { alert("ส่งออกข้อมูล..."); }
+</script>
