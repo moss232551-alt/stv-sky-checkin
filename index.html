@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเช็คชื่อคณะสีฟ้า - Stv-Sky-Check</title>
+    <title>ระบบเช็คชื่อคณะสีฟ้า - Stv-Sky-Check-new</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style> body { font-family: 'Kanit', sans-serif; } </style>
@@ -35,7 +35,7 @@
         
         <div class="bg-white border-b border-slate-100 flex flex-col sm:flex-row justify-between max-w-5xl mx-auto px-4 items-center gap-2 py-2 sm:py-0">
             <div class="flex gap-4 w-full sm:w-auto justify-center sm:justify-start">
-                <button onclick="switchTab('attendance')" id="tab-attendance" class="py-3 px-4 border-b-2 border-blue-500 text-blue-600 font-medium text-sm transition-all">📝 หน้าเช็คชื่อนักเรียน</button>
+                <button onclick="switchTab('attendance')" id="tab-attendance" class="py-3 px-4 border-b-2 border-blue-500 text-blue-600 font-medium text-sm transition-all">📝 หน้าเช็คชื่อ</button>
                 <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-slate-600 font-medium text-sm transition-all">📊 แดชบอร์ดครู</button>
             </div>
             
@@ -62,7 +62,6 @@
     </header>
 
     <main class="max-w-5xl mx-auto px-4 py-8">
-        
         <div id="section-attendance" class="block">
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6">
                 <h2 class="text-sm font-medium text-slate-400 uppercase tracking-wider mb-4">กรองรายชื่อ</h2>
@@ -84,7 +83,7 @@
             <section class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <h3 class="font-medium text-slate-700">รายชื่อนักเรียน <span id="current-view-title" class="text-blue-500 font-semibold">ห้อง ม.4/1</span></h3>
-                    <button id="reset-room-btn" onclick="resetCurrentRoom()" disabled class="text-xs text-slate-300 cursor-not-allowed flex items-center gap-1">🔄 รีเซ็ตสถานะห้องนี้</button>
+                    <button id="reset-room-btn" onclick="resetCurrentRoom()" disabled class="text-xs text-slate-300 cursor-not-allowed flex items-center gap-1">🔄 รีเซ็ตห้องนี้</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -120,10 +119,9 @@
         </div>
     </div>
 
-<script>
-        // URL ของ Google Apps Script ของคุณ
+    <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbw7nAaoTsyPsOcoTMGqOz09INrgM9cK7J6qM3P0x1UuHY04CdSQGaQSCatZoCuxkXI/exec"; 
-        const ADMIN_EMAILS = ["sirsribua04@gmail.com", "106422922@stv.ac.th", "96422885@stv.ac.th","nantapong232551@gmail.com","parittaks@gmail.com"];
+        const ADMIN_EMAILS = ["sirsribua04@gmail.com", "106422922@stv.ac.th", "@gmail.com","nantapong232551@gmail.com","parittaks@gmail.com"];
         
         const studentData = {
             m1: {
@@ -489,8 +487,28 @@
             syncText: document.getElementById('sync-text')
         };
 
+        // 🌟 เพิ่มฟังก์ชันสำหรับเช็คระบบ Auto-Login
+        function checkAutoLogin() {
+            const savedEmail = localStorage.getItem('stvAdminEmail');
+            if (savedEmail && ADMIN_EMAILS.includes(savedEmail.toLowerCase())) {
+                isAdmin = true;
+                const input = document.getElementById('admin-email-input');
+                const authBtn = document.getElementById('auth-btn');
+                const badge = document.getElementById('permission-badge');
+                
+                input.value = savedEmail;
+                input.disabled = true;
+                authBtn.innerText = "ออก";
+                authBtn.classList.replace('bg-blue-500', 'bg-red-500');
+                badge.innerText = "⚡ โหมดสตาฟ (เข้าสู่ระบบแล้ว)";
+                badge.className = "bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-medium";
+                document.getElementById('reset-room-btn').disabled = false;
+            }
+        }
+
         async function init() {
             setSyncStatus('loading');
+            checkAutoLogin(); // เรียกเช็คล็อกอินก่อนเลย
             
             const savedStr = localStorage.getItem('colorSportsAttendance');
             if (savedStr) {
@@ -534,7 +552,6 @@
                 const hasCloudData = Object.keys(data.morning || {}).length > 0 || Object.keys(data.evening || {}).length > 0;
                 const hasLocalData = Object.keys(attendanceRecord.morning || {}).length > 0 || Object.keys(attendanceRecord.evening || {}).length > 0;
                 
-                // ดึงข้อมูลมาทับเฉพาะกรณีที่ฝั่ง Cloud มีคนเช็คแล้วเท่านั้น กันค่าว่างวิ่งมาลบข้อมูลในเครื่อง
                 if (hasCloudData || !hasLocalData) {
                     attendanceRecord = data;
                     localStorage.setItem('colorSportsAttendance', JSON.stringify({ date: todayDate, records: attendanceRecord }));
@@ -548,18 +565,15 @@
             }
         }
 
-        // แก้ไขระบบส่งข้อมูล บังคับโหมดไม่เช็ค CORS (no-cors) เพื่อให้ยิงเข้า Google Sheets ได้เสถียร
         async function saveData() {
             localStorage.setItem('colorSportsAttendance', JSON.stringify({ date: todayDate, records: attendanceRecord }));
             isSyncing = true;
             setSyncStatus('syncing');
             try {
+                // แก้ไขการส่งไปที่ Google Sheet ให้ส่งเป็นแบบปกติ
                 await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', 
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ date: todayDate, records: attendanceRecord })
                 });
                 setSyncStatus('online');
@@ -576,10 +590,10 @@
                 elements.syncText.innerText = "กำลังเชื่อมต่อ...";
             } else if (status === 'syncing') {
                 elements.syncStatus.className = "w-2 h-2 rounded-full bg-blue-500 animate-pulse";
-                elements.syncText.innerText = "กำลังเซฟ...";
+                elements.syncText.innerText = "กำลังส่งไปเก็บที่ Google Sheet...";
             } else if (status === 'online') {
                 elements.syncStatus.className = "w-2 h-2 rounded-full bg-emerald-500";
-                elements.syncText.innerText = "ออนไลน์ (ซิงค์ล่าสุดแล้ว)";
+                elements.syncText.innerText = "ออนไลน์ (ข้อมูลตรงกัน)";
             } else {
                 elements.syncStatus.className = "w-2 h-2 rounded-full bg-rose-500";
                 elements.syncText.innerText = "ออฟไลน์";
@@ -590,18 +604,35 @@
             const input = document.getElementById('admin-email-input');
             const authBtn = document.getElementById('auth-btn');
             const badge = document.getElementById('permission-badge');
+            
             if (!isAdmin) {
-                if (ADMIN_EMAILS.includes(input.value.trim().toLowerCase())) {
-                    isAdmin = true; input.disabled = true; authBtn.innerText = "ออก";
+                const enteredEmail = input.value.trim().toLowerCase();
+                if (ADMIN_EMAILS.includes(enteredEmail)) {
+                    isAdmin = true; 
+                    input.disabled = true; 
+                    authBtn.innerText = "ออก";
                     authBtn.classList.replace('bg-blue-500', 'bg-red-500');
-                    badge.innerText = "⚡ โหมดสตาฟ"; badge.className = "bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-medium";
+                    badge.innerText = "⚡ โหมดสตาฟ"; 
+                    badge.className = "bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-medium";
                     document.getElementById('reset-room-btn').disabled = false;
-                } else alert("❌ อีเมลไม่ถูกต้อง");
+                    
+                    // 🌟 เพิ่มคำสั่งให้จำอีเมลลงเบราว์เซอร์
+                    localStorage.setItem('stvAdminEmail', enteredEmail);
+                } else {
+                    alert("❌ อีเมลไม่ถูกต้อง ลองตรวจสอบการสะกดอีกครั้งครับ");
+                }
             } else {
-                isAdmin = false; input.value = ""; input.disabled = false; authBtn.innerText = "ยืนยัน";
+                isAdmin = false; 
+                input.value = ""; 
+                input.disabled = false; 
+                authBtn.innerText = "ยืนยัน";
                 authBtn.classList.replace('bg-red-500', 'bg-blue-500');
-                badge.innerText = "👁️ ดูอย่างเดียว"; badge.className = "bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs font-medium";
+                badge.innerText = "👁️ ดูอย่างเดียว"; 
+                badge.className = "bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs font-medium";
                 document.getElementById('reset-room-btn').disabled = true;
+                
+                // 🌟 เพิ่มคำสั่งล้างความจำตอนกออกจากระบบ
+                localStorage.removeItem('stvAdminEmail');
             }
             renderStudents();
         }
@@ -682,7 +713,7 @@
                     const card = document.createElement('div');
                     card.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-100 cursor-pointer";
                     card.onclick = () => openRoomDetails(grade, room, students);
-                    card.innerHTML = `<h3 class="text-lg font-bold text-slate-700">${gradeLabels[grade]} / ${room}</h3><p class="text-xs mb-4 text-slate-400">ค้างเช็ค ${t-(p+l+a)} คน</p>
+                    card.innerHTML = `<h3 class="text-lg font-bold">${gradeLabels[grade]} / ${room}</h3><p class="text-xs mb-4">ค้างเช็ค ${t-(p+l+a)} คน</p>
                     <div class="grid grid-cols-3 gap-2 text-center text-xs">
                         <div class="bg-emerald-50 text-emerald-600 rounded-xl py-2"><div>มา</div><div class="font-bold">${p}</div></div>
                         <div class="bg-amber-50 text-amber-600 rounded-xl py-2"><div>ลา</div><div class="font-bold">${l}</div></div>
@@ -700,9 +731,9 @@
             let lists = { p: [], l: [], a: [] };
             students.forEach(s => { const st = attendanceRecord[currentTimePeriod][s.id]; if(st==='present') lists.p.push(s); else if(st==='leave') lists.l.push(s); else if(st==='absent') lists.a.push(s); });
             mContent.innerHTML = `
-                <div class="border border-rose-100 p-4 bg-rose-50/20 rounded-xl"><h4 class="font-bold text-rose-600">❌ ขาด (${lists.a.length})</h4><ul class="text-xs">${lists.a.map(s=>`<li>เลขที่ ${s.no} - ${s.name}</li>`).join('')}</ul></div>
-                <div class="border border-amber-100 p-4 bg-amber-50/20 rounded-xl"><h4 class="font-bold text-amber-600">⚠️ ลา (${lists.l.length})</h4><ul class="text-xs">${lists.l.map(s=>`<li>เลขที่ ${s.no} - ${s.name}</li>`).join('')}</ul></div>
-                <div class="border border-emerald-100 p-4 bg-emerald-50/10 rounded-xl"><h4 class="font-bold text-emerald-600">✅ มา (${lists.p.length})</h4><ul class="text-xs">${lists.p.map(s=>`<li>เลขที่ ${s.no} - ${s.name}</li>`).join('')}</ul></div>
+                <div class="border border-rose-100 p-4 bg-rose-50/20 rounded-xl"><h4 class="font-bold text-rose-600">❌ ขาด (${lists.a.length})</h4><ul class="text-xs">${lists.a.length===0?'ไม่มี':lists.a.map(s=>`<li>เลขที่ ${s.no} - ${s.name}</li>`).join('')}</ul></div>
+                <div class="border border-amber-100 p-4 bg-amber-50/20 rounded-xl"><h4 class="font-bold text-amber-600">⚠️ ลา (${lists.l.length})</h4><ul class="text-xs">${lists.l.length===0?'ไม่มี':lists.l.map(s=>`<li>เลขที่ ${s.no} - ${s.name}</li>`).join('')}</ul></div>
+                <div class="border border-emerald-100 p-4 bg-emerald-50/10 rounded-xl"><h4 class="font-bold text-emerald-600">✅ มา (${lists.p.length})</h4><ul class="text-xs">${lists.p.length===0?'ไม่มี':lists.p.map(s=>`<li>เลขที่ ${s.no} - ${s.name}</li>`).join('')}</ul></div>
             `;
             document.getElementById('details-modal').classList.remove('hidden');
         }
@@ -710,7 +741,6 @@
         function closeModal() { document.getElementById('details-modal').classList.add('hidden'); }
         function resetCurrentRoom() { if(isAdmin && confirm('ล้างข้อมูล?')) { studentData[currentGrade][currentRoom].forEach(s => delete attendanceRecord[currentTimePeriod][s.id]); saveData(); renderStudents(); calculateStats(); } }
         
-        // ฟังก์ชันโหลดไฟล์ Excel (.csv) ด้วยระบบ Blob แบบแก้ไขสระภาษาไทยเพี้ยน
         function exportToCSV() {
             try {
                 let csvContent = "\uFEFFรหัสนักเรียน,เลขที่,ชื่อ-นามสกุล,ระดับชั้น,ห้อง,สถานะ(เช้า),สถานะ(เย็น)\n";
@@ -725,12 +755,8 @@
                 Object.keys(studentData).forEach(grade => {
                     Object.keys(studentData[grade]).forEach(room => {
                         studentData[grade][room].forEach(student => {
-                            const mStatusRaw = attendanceRecord.morning[student.id];
-                            const eStatusRaw = attendanceRecord.evening[student.id];
-                            
-                            const mStatus = mStatusRaw ? statusMap[mStatusRaw] : "ยังไม่เช็ค";
-                            const eStatus = eStatusRaw ? statusMap[eStatusRaw] : "ยังไม่เช็ค";
-                            
+                            const mStatus = attendanceRecord.morning[student.id] ? statusMap[attendanceRecord.morning[student.id]] : "ยังไม่เช็ค";
+                            const eStatus = attendanceRecord.evening[student.id] ? statusMap[attendanceRecord.evening[student.id]] : "ยังไม่เช็ค";
                             csvContent += `${student.id},${student.no},"${student.name}",${gradeLabels[grade] || grade.toUpperCase()},${room},${mStatus},${eStatus}\n`;
                         });
                     });
@@ -739,15 +765,12 @@
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement("a");
-                
                 link.setAttribute("href", url);
                 link.setAttribute("download", `สรุปเช็คชื่อคณะสี_${new Date().toISOString().slice(0,10)}.csv`);
                 link.style.visibility = 'hidden';
-                
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                
                 URL.revokeObjectURL(url);
             } catch (error) {
                 alert("เกิดข้อผิดพลาดในการสร้างไฟล์ Excel: " + error.message);
@@ -758,3 +781,5 @@
 
         init();
     </script>
+</body>
+</html>
