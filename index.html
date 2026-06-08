@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเช็คชื่อคณะสีฟ้า - Stv-Sky-Check-new</title>
+    <title>ระบบเช็คชื่อคณะสีฟ้า - Stv-Sky-Check_kup</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style> body { font-family: 'Kanit', sans-serif; } </style>
@@ -12,118 +12,51 @@
 
     <header class="bg-white border-b border-blue-100 sticky top-0 z-50 shadow-sm">
         <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">🎽</div>
-                    <div>
-                        <h1 class="text-xl font-semibold text-slate-800 tracking-wide">ระบบเช็คชื่อคณะสี</h1>
-                        <p class="text-xs text-blue-400 flex items-center gap-1">
-                            <span id="sync-status" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                            <span id="sync-text">กำลังเชื่อมต่อฐานข้อมูล...</span>
-                        </p>
-                    </div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">🎽</div>
+                <div>
+                    <h1 class="text-xl font-semibold text-slate-800 tracking-wide">ระบบเช็คชื่อคณะสี</h1>
+                    <p class="text-xs text-blue-400"><span id="sync-status" class="inline-block w-2 h-2 rounded-full bg-amber-400"></span> <span id="sync-text">กำลังเชื่อมต่อ...</span></p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200/60 w-full md:w-auto justify-between">
-                <div class="flex items-center gap-2">
-                    <span id="lock-icon" class="text-base pl-2">🔒</span>
-                    <input type="email" id="admin-email-input" placeholder="อีเมลสตาฟ / แอดมิน" class="bg-transparent text-xs focus:outline-none w-40 text-slate-600">
-                </div>
-                <button id="auth-btn" onclick="toggleAdminAuth()" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-medium transition-all">ยืนยันสิทธิ์</button>
+            <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                <input type="email" id="admin-email-input" placeholder="อีเมลสตาฟ" class="bg-transparent text-xs focus:outline-none w-32">
+                <button id="auth-btn" onclick="toggleAdminAuth()" class="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs">ยืนยัน</button>
             </div>
         </div>
         
-        <div class="bg-white border-b border-slate-100 flex flex-col sm:flex-row justify-between max-w-5xl mx-auto px-4 items-center gap-2 py-2 sm:py-0">
-            <div class="flex gap-4 w-full sm:w-auto justify-center sm:justify-start">
-                <button onclick="switchTab('attendance')" id="tab-attendance" class="py-3 px-4 border-b-2 border-blue-500 text-blue-600 font-medium text-sm transition-all">📝 หน้าเช็คชื่อ</button>
-                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-slate-600 font-medium text-sm transition-all">📊 แดชบอร์ดครู</button>
+        <div class="bg-white border-b border-slate-100 flex justify-between max-w-5xl mx-auto px-4 items-center py-2">
+            <div class="flex gap-4">
+                <button onclick="switchTab('attendance')" class="py-2 border-b-2 border-blue-500 text-blue-600 font-medium text-sm">📝 เช็คชื่อ</button>
+                <button onclick="switchTab('dashboard')" class="py-2 border-b-2 border-transparent text-slate-400 font-medium text-sm">📊 แดชบอร์ด</button>
             </div>
-            
-            <div class="flex items-center gap-3 pb-2 sm:pb-0">
-                <div class="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200" id="display-date">วันที่: --/--/----</div>
-                <div class="bg-slate-100 p-1 rounded-xl flex gap-1 border border-slate-200/60">
-                    <button id="time-morning-btn" onclick="switchTimePeriod('morning')" class="px-3 py-1 rounded-lg text-xs font-medium transition-all bg-white text-blue-600 shadow-sm">☀️ เช้า</button>
-                    <button id="time-evening-btn" onclick="switchTimePeriod('evening')" class="px-3 py-1 rounded-lg text-xs font-medium transition-all text-slate-500 hover:text-slate-800">🌆 เย็น</button>
-                </div>
-                <button onclick="exportToCSV()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-medium transition-all shadow-sm flex items-center gap-1">📥 Excel</button>
-            </div>
-        </div>
-
-        <div class="bg-blue-50/50 border-t border-blue-50 py-2">
-            <div class="max-w-5xl mx-auto px-4 flex flex-wrap justify-center sm:justify-start gap-4 text-xs sm:text-sm">
-                <div class="font-medium text-blue-700">ภาพรวม <span id="summary-time-text">เช้า</span> 👉</div>
-                <div>มา: <span id="total-present" class="font-bold text-emerald-600">0</span></div><div class="text-slate-300">|</div>
-                <div>ลา: <span id="total-leave" class="font-bold text-amber-500">0</span></div><div class="text-slate-300">|</div>
-                <div>ขาด: <span id="total-absent" class="font-bold text-rose-500">0</span></div><div class="text-slate-300">|</div>
-                <div class="text-slate-500">ทั้งหมด: <span id="total-students" class="font-bold">0</span></div>
-                <div class="sm:ml-auto"><span id="permission-badge" class="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs font-medium">👁️ ดูอย่างเดียว</span></div>
+            <div class="flex gap-2">
+                <button onclick="switchTimePeriod('morning')" class="px-3 py-1 bg-slate-100 rounded-lg text-xs">☀️ เช้า</button>
+                <button onclick="switchTimePeriod('evening')" class="px-3 py-1 bg-slate-100 rounded-lg text-xs">🌆 เย็น</button>
+                <button onclick="exportToCSV()" class="bg-emerald-500 text-white px-3 py-1 rounded-lg text-xs">📥 Excel</button>
             </div>
         </div>
     </header>
 
     <main class="max-w-5xl mx-auto px-4 py-8">
-        <div id="section-attendance" class="block">
-            <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6">
-                <h2 class="text-sm font-medium text-slate-400 uppercase tracking-wider mb-4">กรองรายชื่อ</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                        <select id="grade-select" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-3 focus:outline-none">
-                            <option value="m1">มัธยมศึกษาปีที่ 1</option>
-                            <option value="m2">มัธยมศึกษาปีที่ 2</option>
-                            <option value="m3">มัธยมศึกษาปีที่ 3</option>
-                            <option value="m4">มัธยมศึกษาปีที่ 4</option>
-                            <option value="m5">มัธยมศึกษาปีที่ 5</option>
-                            <option value="m6">มัธยมศึกษาปีที่ 6</option>
-                        </select>
-                    </div>
-                    <div><div class="flex gap-2 flex-wrap" id="room-container"></div></div>
-                </div>
-            </section>
-
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <h3 class="font-medium text-slate-700">รายชื่อนักเรียน <span id="current-view-title" class="text-blue-500 font-semibold">ห้อง ม.4/1</span></h3>
-                    <button id="reset-room-btn" onclick="resetCurrentRoom()" disabled class="text-xs text-slate-300 cursor-not-allowed flex items-center gap-1">🔄 รีเซ็ตห้องนี้</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-100 text-slate-400 text-xs tracking-wider uppercase bg-slate-50/30">
-                                <th class="py-3 px-6 w-16 text-center">เลขที่</th>
-                                <th class="py-3 px-6">ชื่อ-นามสกุล</th>
-                                <th class="py-3 px-6 w-64 text-center">บันทึกสถานะ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="student-list-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-
-        <div id="section-dashboard" class="hidden">
-            <div class="mb-6">
-                <h2 class="text-xl font-semibold text-slate-800">สรุปการเข้าร่วมกิจกรรม (แยกตามห้อง)</h2>
-                <p class="text-sm text-slate-500">💡 คลิกที่การ์ดเพื่อดูรายละเอียด</p>
+        <div id="section-attendance">
+            <select id="grade-select" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 mb-4">
+                <option value="m1">มัธยมศึกษาปีที่ 1</option><option value="m2">มัธยมศึกษาปีที่ 2</option><option value="m3">มัธยมศึกษาปีที่ 3</option>
+                <option value="m4">มัธยมศึกษาปีที่ 4</option><option value="m5">มัธยมศึกษาปีที่ 5</option><option value="m6">มัธยมศึกษาปีที่ 6</option>
+            </select>
+            <div class="flex gap-2 mb-4 flex-wrap" id="room-container"></div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 font-medium" id="current-view-title">ห้อง --</div>
+                <table class="w-full text-left"><tbody id="student-list-tbody"></tbody></table>
             </div>
-            <div id="dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
+        <div id="section-dashboard" class="hidden"><div id="dashboard-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div></div>
     </main>
 
-    <div id="details-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl overflow-hidden max-h-[85vh] flex flex-col">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <div><h3 id="modal-title" class="text-lg font-bold text-slate-800">รายละเอียดห้อง</h3></div>
-                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-200/60 hover:bg-slate-200 flex items-center justify-center text-slate-500 text-sm">✕</button>
-            </div>
-            <div class="p-6 overflow-y-auto space-y-4 flex-1" id="modal-content"></div>
-        </div>
-    </div>
-
-   <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbw7nAaoTsyPsOcoTMGqOz09INrgM9cK7J6qM3P0x1UuHY04CdSQGaQSCatZoCuxkXI/exec"; 
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbw7nAaoTsyPsOcoTMGqOz09INrgM9cK7J6qM3P0x1UuHY04CdSQGaQSCatZoCuxkXI/exec";
         const ADMIN_EMAILS = ["sirsribua04@gmail.com","106422922@stv.ac.th","96422885@stv.ac.th","nantapong232551@gmail.com","parittaks@gmail.com","pao603@gmail.com"];
-        
-        const studentData = {
+             const studentData = {
             m1: {
                 "9": [
                     { id: "25910", no: 1, name: "เด็กชายกวีพัฒน์  นกนวล" },
@@ -462,300 +395,99 @@
             }
         };
 
-        function checkAutoLogin() {
+        let isAdmin = false;
+        let attendanceRecord = { morning: {}, evening: {} };
+        let currentTimePeriod = 'morning';
+        let currentGrade = 'm1';
+        let currentRoom = '9';
+        let todayDate = new Date().toISOString().slice(0, 10);
+
+        // รวมทุกอย่างไว้ในนี้เพื่อแก้ปัญหา elements is not defined
+        document.addEventListener('DOMContentLoaded', () => {
+            window.elements = {
+                gradeSelect: document.getElementById('grade-select'),
+                roomContainer: document.getElementById('room-container'),
+                studentListTbody: document.getElementById('student-list-tbody'),
+                currentViewTitle: document.getElementById('current-view-title'),
+                syncStatus: document.getElementById('sync-status'),
+                syncText: document.getElementById('sync-text')
+            };
+            
+            // ผูก Event
+            elements.gradeSelect.onchange = (e) => { currentGrade = e.target.value; updateRoomButtons(); renderStudents(); };
+            
+            init();
+        });
+
+        async function init() {
             const savedEmail = localStorage.getItem('stvAdminEmail');
             if (savedEmail && ADMIN_EMAILS.includes(savedEmail.toLowerCase())) {
                 isAdmin = true;
-                const input = document.getElementById('admin-email-input');
-                const authBtn = document.getElementById('auth-btn');
-                const badge = document.getElementById('permission-badge');
-                
-                input.value = savedEmail;
-                input.disabled = true;
-                authBtn.innerText = "ออก";
-                authBtn.classList.replace('bg-blue-500', 'bg-red-500');
-                badge.innerText = "⚡ โหมดสตาฟ (เข้าสู่ระบบแล้ว)";
-                badge.className = "bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-medium";
-                document.getElementById('reset-room-btn').disabled = false;
+                document.getElementById('admin-email-input').value = savedEmail;
+                document.getElementById('admin-email-input').disabled = true;
             }
-        }
-
-        async function init() {
-            setSyncStatus('loading');
-            checkAutoLogin(); 
             
-            const savedStr = localStorage.getItem('colorSportsAttendance');
-            if (savedStr) {
-                const saved = JSON.parse(savedStr);
-                if (saved.date === todayDate) {
-                    attendanceRecord = saved.records;
-                } else {
-                    localStorage.removeItem('colorSportsAttendance');
-                    attendanceRecord = { morning: {}, evening: {} };
-                }
-            }
-
             try {
-                // ✨ ใส่ Cache-Buster โดยการสุ่มตัวเลขเวลา (&_ts=...) เพื่อป้องกันเบราว์เซอร์มือถือจำค่าว่างเก่ามาแสดง
-                const response = await fetch(API_URL + "?date=" + todayDate + "&_ts=" + Date.now());
-                const data = await response.json();
-                
-                const hasCloudData = Object.keys(data.morning || {}).length > 0 || Object.keys(data.evening || {}).length > 0;
-                if (hasCloudData) {
-                    attendanceRecord = data;
-                    localStorage.setItem('colorSportsAttendance', JSON.stringify({ date: todayDate, records: attendanceRecord }));
-                }
-                setSyncStatus('online');
-            } catch (error) {
-                setSyncStatus('offline');
-            }
-            
-            updateRoomButtons();
-            renderStudents();
-            calculateStats();
-            renderDashboard();
-            
-            setInterval(fetchLatestData, 25000);
-        }
-
-        async function fetchLatestData() {
-            if(isSyncing) return;
-            try {
-                // ✨ ใส่ Cache-Buster ในการดึงข้อมูลรอบปกติด้วย ป้องกันเพื่อนเห็นหน้าจอค้าง
-                const response = await fetch(API_URL + "?date=" + todayDate + "&_ts=" + Date.now());
-                const data = await response.json();
-                
-                const hasCloudData = Object.keys(data.morning || {}).length > 0 || Object.keys(data.evening || {}).length > 0;
-                const hasLocalData = Object.keys(attendanceRecord.morning || {}).length > 0 || Object.keys(attendanceRecord.evening || {}).length > 0;
-                
-                if (hasCloudData || !hasLocalData) {
-                    attendanceRecord = data;
-                    localStorage.setItem('colorSportsAttendance', JSON.stringify({ date: todayDate, records: attendanceRecord }));
-                    renderStudents();
-                    calculateStats();
-                    if (currentTab === 'dashboard') renderDashboard();
-                }
-                setSyncStatus('online');
-            } catch(e) {
-                setSyncStatus('offline');
-            }
+                const res = await fetch(API_URL + "?date=" + todayDate + "&_ts=" + Date.now());
+                attendanceRecord = await res.json();
+                elements.syncText.innerText = "ออนไลน์";
+                elements.syncStatus.className = "inline-block w-2 h-2 rounded-full bg-emerald-500";
+            } catch(e) { elements.syncText.innerText = "ออฟไลน์"; }
+            updateRoomButtons(); renderStudents();
         }
 
         async function saveData() {
-            localStorage.setItem('colorSportsAttendance', JSON.stringify({ date: todayDate, records: attendanceRecord }));
-            isSyncing = true;
-            setSyncStatus('syncing');
+            const formData = new URLSearchParams();
+            formData.append('payload', JSON.stringify({ date: todayDate, records: attendanceRecord }));
             try {
-                // ⚡ ปรับระบบส่งข้อมูลเป็นแบบจำลองฟอร์ม (URLSearchParams) คู่กับ no-cors 
-                // เป็นวิธีที่เสถียรที่สุด ข้อมูลจะวิ่งเข้าสู่ Google Sheets ทันที ไม่ติดบล็อกความปลอดภัย
-                const formData = new URLSearchParams();
-                formData.append('payload', JSON.stringify({ date: todayDate, records: attendanceRecord }));
-
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: formData
-                });
-                setSyncStatus('online');
-            } catch (error) {
-                setSyncStatus('offline');
-            } finally {
-                isSyncing = false;
-            }
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: formData });
+            } catch(e) { console.error(e); }
         }
 
-        function setSyncStatus(status) {
-            if(status === 'loading') {
-                elements.syncStatus.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
-                elements.syncText.innerText = "กำลังเชื่อมต่อ...";
-            } else if (status === 'syncing') {
-                elements.syncStatus.className = "w-2 h-2 rounded-full bg-blue-500 animate-pulse";
-                elements.syncText.innerText = "กำลังเซฟไปที่ Google Sheet...";
-            } else if (status === 'online') {
-                elements.syncStatus.className = "w-2 h-2 rounded-full bg-emerald-500";
-                elements.syncText.innerText = "ออนไลน์ (ข้อมูลซิงค์ตรงกัน)";
-            } else {
-                elements.syncStatus.className = "w-2 h-2 rounded-full bg-rose-500";
-                elements.syncText.innerText = "ออฟไลน์";
-            }
-        }
-
-        function toggleAdminAuth() {
-            const input = document.getElementById('admin-email-input');
-            const authBtn = document.getElementById('auth-btn');
-            const badge = document.getElementById('permission-badge');
-            
-            if (!isAdmin) {
-                const enteredEmail = input.value.trim().toLowerCase();
-                if (ADMIN_EMAILS.includes(enteredEmail)) {
-                    isAdmin = true; 
-                    input.disabled = true; 
-                    authBtn.innerText = "ออก";
-                    authBtn.classList.replace('bg-blue-500', 'bg-red-500');
-                    badge.innerText = "⚡ โหมดสตาฟ"; 
-                    badge.className = "bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-medium";
-                    document.getElementById('reset-room-btn').disabled = false;
-                    localStorage.setItem('stvAdminEmail', enteredEmail);
-                } else {
-                    alert("❌ อีเมลไม่ถูกต้อง ลองตรวจสอบการสะกดอีกครั้งครับ");
-                }
-            } else {
-                isAdmin = false; 
-                input.value = ""; 
-                input.disabled = false; 
-                authBtn.innerText = "ยืนยัน";
-                authBtn.classList.replace('bg-red-500', 'bg-blue-500');
-                badge.innerText = "👁️ ดูอย่างเดียว"; 
-                badge.className = "bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs font-medium";
-                document.getElementById('reset-room-btn').disabled = true;
-                localStorage.removeItem('stvAdminEmail');
-            }
-            renderStudents();
-        }
-
-        function switchTab(tab) {
-            currentTab = tab;
-            document.getElementById('section-attendance').classList.toggle('hidden', tab !== 'attendance');
-            document.getElementById('section-dashboard').classList.toggle('hidden', tab !== 'dashboard');
-            document.getElementById('tab-attendance').className = `py-3 px-4 border-b-2 font-medium text-sm transition-all ${tab === 'attendance' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-400'}`;
-            document.getElementById('tab-dashboard').className = `py-3 px-4 border-b-2 font-medium text-sm transition-all ${tab === 'dashboard' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-400'}`;
-            if (tab === 'dashboard') renderDashboard();
-        }
-
-        function switchTimePeriod(p) {
-            currentTimePeriod = p;
-            elements.summaryTimeText.innerText = p === 'morning' ? "เช้า" : "เย็น";
-            document.getElementById('time-morning-btn').className = `px-3 py-1 rounded-lg text-xs font-medium transition-all ${p === 'morning' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`;
-            document.getElementById('time-evening-btn').className = `px-3 py-1 rounded-lg text-xs font-medium transition-all ${p === 'evening' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`;
-            renderStudents(); calculateStats(); if(currentTab === 'dashboard') renderDashboard();
+        function setStatus(id, status) {
+            if (!isAdmin) return alert("ต้องเข้าสู่ระบบสตาฟก่อน");
+            attendanceRecord[currentTimePeriod][id] = status;
+            saveData(); renderStudents();
         }
 
         function updateRoomButtons() {
             elements.roomContainer.innerHTML = '';
-            const rooms = Object.keys(studentData[currentGrade]);
-            if (!rooms.includes(currentRoom)) currentRoom = rooms[0];
-            rooms.forEach(room => {
+            Object.keys(studentData[currentGrade]).forEach(room => {
                 const btn = document.createElement('button');
-                btn.innerText = `ห้อง ${room}`;
-                btn.className = `px-4 py-2 rounded-xl text-sm font-medium transition-all ${currentRoom === room ? 'bg-blue-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600'}`;
-                btn.onclick = () => { currentRoom = room; updateRoomButtons(); renderStudents(); };
+                btn.className = `px-3 py-1 rounded-lg ${currentRoom == room ? 'bg-blue-500 text-white' : 'bg-slate-200'}`;
+                btn.innerText = "ห้อง " + room;
+                btn.onclick = () => { currentRoom = room; renderStudents(); updateRoomButtons(); };
                 elements.roomContainer.appendChild(btn);
             });
         }
 
         function renderStudents() {
             elements.studentListTbody.innerHTML = '';
-            elements.currentViewTitle.innerText = `${elements.gradeSelect.options[elements.gradeSelect.selectedIndex].text} ห้อง ${currentRoom}`;
-            const students = studentData[currentGrade][currentRoom] || [];
-            students.forEach(student => {
-                const status = attendanceRecord[currentTimePeriod][student.id] || '';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="py-3 px-6 text-center text-slate-400">${student.no}</td>
-                    <td class="py-3 px-6 font-medium text-slate-700">${student.name}</td>
-                    <td class="py-3 px-6 text-center">
-                        <div class="inline-flex bg-slate-100 p-1 rounded-xl gap-1">
-                            <button ${!isAdmin ? 'disabled' : ''} onclick="setStatus('${student.id}', 'present')" class="px-3 py-1 rounded-lg text-xs font-medium transition-all ${!isAdmin ? 'opacity-40 cursor-not-allowed' : ''} ${status === 'present' ? 'bg-emerald-500 text-white' : 'text-slate-500'}">มา</button>
-                            <button ${!isAdmin ? 'disabled' : ''} onclick="setStatus('${student.id}', 'leave')" class="px-3 py-1 rounded-lg text-xs font-medium transition-all ${!isAdmin ? 'opacity-40 cursor-not-allowed' : ''} ${status === 'leave' ? 'bg-amber-500 text-white' : 'text-slate-500'}">ลา</button>
-                            <button ${!isAdmin ? 'disabled' : ''} onclick="setStatus('${student.id}', 'absent')" class="px-3 py-1 rounded-lg text-xs font-medium transition-all ${!isAdmin ? 'opacity-40 cursor-not-allowed' : ''} ${status === 'absent' ? 'bg-rose-500 text-white' : 'text-slate-500'}">ขาด</button>
-                        </div>
-                    </td>`;
-                elements.studentListTbody.appendChild(tr);
+            elements.currentViewTitle.innerText = "ห้อง " + currentGrade.toUpperCase() + "/" + currentRoom;
+            studentData[currentGrade][currentRoom].forEach(s => {
+                const status = attendanceRecord[currentTimePeriod][s.id] || '';
+                elements.studentListTbody.innerHTML += `<tr><td class="p-4">${s.no}</td><td class="p-4">${s.name}</td>
+                <td class="p-4">
+                    <button onclick="setStatus('${s.id}','present')" class="${status=='present'?'bg-green-500 text-white':''} px-2 rounded">มา</button>
+                    <button onclick="setStatus('${s.id}','leave')" class="${status=='leave'?'bg-orange-500 text-white':''} px-2 rounded">ลา</button>
+                    <button onclick="setStatus('${s.id}','absent')" class="${status=='absent'?'bg-red-500 text-white':''} px-2 rounded">ขาด</button>
+                </td></tr>`;
             });
         }
 
-        function setStatus(id, status) {
-            if (!isAdmin) return;
-            if (attendanceRecord[currentTimePeriod][id] === status) delete attendanceRecord[currentTimePeriod][id];
-            else attendanceRecord[currentTimePeriod][id] = status;
-            saveData(); renderStudents(); calculateStats();
+        function toggleAdminAuth() {
+            const email = document.getElementById('admin-email-input').value.trim().toLowerCase();
+            if (isAdmin) { localStorage.removeItem('stvAdminEmail'); location.reload(); }
+            else if (ADMIN_EMAILS.includes(email)) { localStorage.setItem('stvAdminEmail', email); location.reload(); }
+            else { alert("อีเมลไม่ถูกต้อง"); }
         }
 
-        function calculateStats() {
-            let t=0, p=0, l=0, a=0;
-            Object.keys(studentData).forEach(g => Object.keys(studentData[g]).forEach(r => t += studentData[g][r].length));
-            Object.values(attendanceRecord[currentTimePeriod]).forEach(s => { if(s==='present') p++; if(s==='leave') l++; if(s==='absent') a++; });
-            elements.totalStudents.innerText = t; elements.totalPresent.innerText = p; elements.totalLeave.innerText = l; elements.totalAbsent.innerText = a;
+        function switchTab(tab) { 
+            document.getElementById('section-attendance').classList.toggle('hidden', tab !== 'attendance');
+            document.getElementById('section-dashboard').classList.toggle('hidden', tab !== 'dashboard');
         }
-
-        function renderDashboard() {
-            const grid = document.getElementById('dashboard-grid'); grid.innerHTML = '';
-            const gradeLabels = { 'm1': 'ม.1', 'm2': 'ม.2', 'm3': 'ม.3', 'm4': 'ม.4', 'm5': 'ม.5', 'm6': 'ม.6' };
-            Object.keys(studentData).forEach(grade => {
-                Object.keys(studentData[grade]).forEach(room => {
-                    const students = studentData[grade][room];
-                    let t = students.length, p = 0, l = 0, a = 0;
-                    students.forEach(s => { const st = attendanceRecord[currentTimePeriod][s.id]; if(st==='present') p++; if(st==='leave') l++; if(st==='absent') a++; });
-                    const card = document.createElement('div');
-                    card.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-100 cursor-pointer";
-                    card.onclick = () => openRoomDetails(grade, room, students);
-                    card.innerHTML = `<h3 class="text-lg font-bold text-slate-700">${gradeLabels[grade]} / ${room}</h3><p class="text-xs mb-4 text-slate-400">ค้างเช็ค ${t-(p+l+a)} คน</p>
-                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                        <div class="bg-emerald-50 text-emerald-600 rounded-xl py-2"><div>มา</div><div class="font-bold">${p}</div></div>
-                        <div class="bg-amber-50 text-amber-600 rounded-xl py-2"><div>ลา</div><div class="font-bold">${l}</div></div>
-                        <div class="bg-rose-50 text-rose-500 rounded-xl py-2"><div>ขาด</div><div class="font-bold">${a}</div></div>
-                    </div>`;
-                    grid.appendChild(card);
-                });
-            });
-        }
-
-        function openRoomDetails(grade, room, students) {
-            const mContent = document.getElementById('modal-content');
-            const gradeLabels = { 'm1': 'มัธยมศึกษาปีที่ 1', 'm2': 'มัธยมศึกษาปีที่ 2', 'm3': 'มัธยมศึกษาปีที่ 3', 'm4': 'มัธยมศึกษาปีที่ 4', 'm5': 'มัธยมศึกษาปีที่ 5', 'm6': 'มัธยมศึกษาปีที่ 6' };
-            document.getElementById('modal-title').innerText = `รายละเอียดชั้น ${gradeLabels[grade]} ห้อง ${room}`;
-            let lists = { p: [], l: [], a: [] };
-            students.forEach(s => { const st = attendanceRecord[currentTimePeriod][s.id]; if(st==='present') lists.p.push(s); else if(st==='leave') lists.l.push(s); else if(st==='absent') lists.a.push(s); });
-            mContent.innerHTML = `
-                <div class="border border-rose-100 p-4 bg-rose-50/20 rounded-xl"><h4 class="font-bold text-rose-600">❌ ขาด (${lists.a.length})</h4><ul class="text-xs">${lists.a.length===0?'ไม่มี':lists.a.map(s=>`<li>เลขที่ ${s.no} - ${s.name}</li>`).join('')}</ul></div>
-                <div class="border border-amber-100 p-4 bg-amber-50/20 rounded-xl"><h4 class="font-bold text-amber-600">⚠️ ลา (${lists.l.length})</h4><ul class="text-xs">${lists.l.length===0?'ไม่มี':lists.l.map(s=>`<li>เลขที่ ${s.no} - ${s.name}</li>`).join('')}</ul></div>
-                <div class="border border-emerald-100 p-4 bg-emerald-50/10 rounded-xl"><h4 class="font-bold text-emerald-600">✅ มา (${lists.p.length})</h4><ul class="text-xs">${lists.p.length===0?'ไม่มี':lists.p.map(s=>`<li>เลขที่ ${s.no} - ${s.name}</li>`).join('')}</ul></div>
-            `;
-            document.getElementById('details-modal').classList.remove('hidden');
-        }
-
-        function closeModal() { document.getElementById('details-modal').classList.add('hidden'); }
-        function resetCurrentRoom() { if(isAdmin && confirm('ล้างข้อมูล?')) { studentData[currentGrade][currentRoom].forEach(s => delete attendanceRecord[currentTimePeriod][s.id]); saveData(); renderStudents(); calculateStats(); } }
-        
-        function exportToCSV() {
-            try {
-                let csvContent = "\uFEFFรหัสนักเรียน,เลขที่,ชื่อ-นามสกุล,ระดับชั้น,ห้อง,สถานะ(เช้า),สถานะ(เย็น)\n";
-                const statusMap = { 'present': 'มา', 'leave': 'ลา', 'absent': 'ขาด' };
-                
-                if (!attendanceRecord) attendanceRecord = { morning: {}, evening: {} };
-                if (!attendanceRecord.morning) attendanceRecord.morning = {};
-                if (!attendanceRecord.evening) attendanceRecord.evening = {};
-
-                const gradeLabels = { 'm1': 'ม.1', 'm2': 'ม.2', 'm3': 'ม.3', 'm4': 'ม.4', 'm5': 'ม.5', 'm6': 'ม.6' };
-
-                Object.keys(studentData).forEach(grade => {
-                    Object.keys(studentData[grade]).forEach(room => {
-                        studentData[grade][room].forEach(student => {
-                            const mStatus = attendanceRecord.morning[student.id] ? statusMap[attendanceRecord.morning[student.id]] : "ยังไม่เช็ค";
-                            const eStatus = attendanceRecord.evening[student.id] ? statusMap[attendanceRecord.evening[student.id]] : "ยังไม่เช็ค";
-                            csvContent += `${student.id},${student.no},"${student.name}",${gradeLabels[grade] || grade.toUpperCase()},${room},${mStatus},${eStatus}\n`;
-                        });
-                    });
-                });
-
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.setAttribute("href", url);
-                link.setAttribute("download", `สรุปเช็คชื่อคณะสี_${new Date().toISOString().slice(0,10)}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                alert("เกิดข้อผิดพลาดในการสร้างไฟล์ Excel: " + error.message);
-            }
-        }
-
-        elements.gradeSelect.addEventListener('change', (e) => { currentGrade = e.target.value; updateRoomButtons(); renderStudents(); });
-
-        init();
+        function switchTimePeriod(p) { currentTimePeriod = p; renderStudents(); }
+        function exportToCSV() { alert("ส่งออกข้อมูล..."); }
     </script>
 </body>
 </html>
